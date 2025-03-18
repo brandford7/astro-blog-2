@@ -1,0 +1,35 @@
+{
+  "site": {
+    "title": "CodeTideHub",
+    "base_url": "https://www.codetidehub.com",
+    "base_path": "/",
+    "trailing_slash": true,
+    "favicon": "../favicon",
+    "logo": "/bitdoze_logo_better.png",
+    "logo_width": "200",
+    "logo_height": "30",
+    "logo_text": "codetidehub logo"
+  },
+
+  "settings": {
+    "pagination": 11,
+    "summary_length": 100
+  },
+
+  "metadata": {
+    "meta_author": "Brandford Junior",
+    "meta_image": "/images/og-image.png",
+    "meta_description": "Discover the latest news and insights on Web Development, javascript,typescript, and anything Reactjs."
+  },
+
+  "params": {
+    "contact_form_action": "#",
+    "copyright": "Copyright © 2025"
+  },
+
+  "contactinfo": {
+    "address": "Ghana, Accra, Greater Accra",
+    "email": "brandfordjunior@gmail.com",
+    "phone": "+233208348487"
+  }
+}

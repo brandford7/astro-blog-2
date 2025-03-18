@@ -1,0 +1,118 @@
+---
+date: 2025-03-17T12:00:00Z
+title: "HTML Essentials: Centering Text, Images, Comments, and More"
+description: "Learn essential HTML techniques like centering text and images, adding comments, linking CSS, and understanding why HTML is important."
+image: "../../assets/images/25/03/html-essentials.png"
+categories: ["web development", "HTML"]
+authors: ["Brandford"]
+tags: ["HTML", "CSS", "beginner guide"]
+canonical: "https://www.codetidehub.com/html-essentials/"
+---
+
+import YouTubeEmbed from "../../layouts/components/widgets/YouTubeEmbed.astro";
+
+HTML is the foundation of web development, and mastering its basics can help you build better websites, and grasp the basics of all these modern web frameworks. In this simple guide, we'll cover essential skills such as centering text and images, adding comments, linking CSS, and understanding why learning HTML is useful.
+
+## Why Is It Useful to Learn HTML?
+
+Learning HTML is essential because:
+
+- **It’s the foundation of the web** – Every website uses HTML.
+- **It improves SEO** – Proper HTML structure enhances search engine visibility.
+- **It complements CSS and JavaScript** – HTML is essential for styling and interactivity.
+- **It makes it very easy to understand any modern web development framework** – Web development skills are in demand.
+- **It helps in career growth** – Web development skills are in demand.
+
+## How to Center Text in HTML
+
+If you want to center text in HTML, you can easily do it using CSS. The simplest way is with the `text-align` property:
+
+```html
+<p style="text-align: center;">This text is centered.</p>
+```
+
+For modern layouts, you can also use Flexbox:
+
+```html
+<div
+  style="display: flex; justify-content: center; align-items: center; height: 100vh;"
+>
+  <p>This text is centered both horizontally and vertically.</p>
+</div>
+```
+
+## How to Center an Image in HTML
+
+To center an image, use the following CSS properties:
+
+```html
+<img
+  src="image.jpg"
+  alt="Centered Image"
+  style="display: block; margin: auto;"
+/>
+```
+
+Margin auto sets the horizontal and vertical margins to auto.
+
+For vertical and horizontal centering, Flexbox can be used:
+
+```html
+<div
+  style="display: flex; justify-content: center; align-items: center; height: 100vh;"
+>
+  <img src="image.jpg" alt="Centered Image" />
+</div>
+```
+
+## How to Comment in HTML
+
+Adding comments in HTML helps document your code and improve readability. Use the following syntax:
+
+```html
+<!-- This is a comment in HTML -->
+<p>This is visible text.</p>
+```
+
+Comments do not appear on the webpage but are useful for developers to understand the code.
+
+## How to Link CSS to HTML
+
+To style your HTML pages, you need to link a CSS file using the `<link>` tag inside the `<head>` section:
+
+```html
+<head>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+```
+
+Alternatively, you can add inline styles directly to elements:
+
+```html
+<p style="color: blue;">This text is blue.</p>
+```
+
+For internal styles, use the `<style>` tag inside `<head>`:
+
+```html
+<head>
+  <style>
+    p {
+      color: red;
+    }
+  </style>
+</head>
+```
+
+## Conclusion
+
+Mastering these basic HTML skills will help you build better web pages with properly centered elements, structured code, and linked styles. Keep practicing and experimenting with HTML to become a better web developer.
+
+For a detailed walkthrough, watch the following video:
+
+<YouTubeEmbed
+  url="https://www.youtube.com/embed/example_video_id"
+  label="HTML Essentials: A Beginner's Guide"
+/>
+
+Understanding HTML is the first step toward mastering web development. Keep learning and exploring to enhance your skills!
