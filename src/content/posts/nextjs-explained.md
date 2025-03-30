@@ -3,9 +3,9 @@ date: 2025-03-24T16:00:00Z
 title: "Next.js Explained: What It is Used For, Frontend or Backend, and How It Compares to React And Angular"
 description: "Explore how Next.js is used to build full-stack web applications using the new App Router, and learn whether it’s better than plain React or Angular."
 image: "../../assets/images/25/03/nextjs-guide.png"
-categories: ["web development", "Next.js"]
+categories: ["React"]
 authors: ["Brandford"]
-tags: ["Next.js", "React", "Angular", "App Router", "SSR", "Full Stack"]
+tags: [ "nextjs","typescript","javascript"]
 canonical: "https://www.codetidehub.com/nextjs-explained/"
 ---
 

@@ -3,9 +3,9 @@ date: 2025-03-27T10:00:00Z
 title: "An Introduction To React Router: Installation, Usage, Benefits, and Advanced Examples"
 description: "An in-depth guide on the latest React Router implementation—learn how to install, set up, and utilize React Router for modern React applications with practical examples and best practices."
 image: "../../assets/images/25/03/react-router-guide.png"
-categories: ["Web Development", "React"]
+categories: [ "React"]
 authors: ["Brandford"]
-tags: ["React Router", "React", "Routing", "JavaScript", "SPA"]
+tags: ["react"]
 canonical: "https://www.codetidehub.com/react-router-library-a-quick-guide/"
 ---
 

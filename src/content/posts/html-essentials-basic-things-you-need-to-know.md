@@ -3,9 +3,9 @@ date: 2025-03-17T12:00:00Z
 title: "HTML Essentials: Centering Text, Images, Comments, and More"
 description: "Learn essential HTML techniques like centering text and images, adding comments, linking CSS, and understanding why HTML is important."
 image: "../../assets/images/25/03/html-essentials.png"
-categories: ["web development", "HTML"]
+categories: ["Web Development"]
 authors: ["Brandford"]
-tags: ["HTML", "CSS", "beginner guide", web development"]
+tags: ["web development"]
 canonical: "https://www.codetidehub.com/html-essentials-basic-things-you-need-to-know/"
 ---
 
@@ -107,4 +107,3 @@ For internal styles, use the `<style>` tag inside `<head>`:
 ## Conclusion
 
 Mastering these basic HTML skills will help you build better web pages with properly centered elements, structured code, and linked styles. Keep practicing and experimenting with HTML to become a better web developer.
-

@@ -3,9 +3,9 @@ date: 2025-03-13T15:44:12Z
 title: "What Are Third Party Libraries Used In React js: A Look At Essential Third-Party Libraries for Enhancing Your React.js Projects"
 description: "Discover the top third-party libraries that can elevate your React.js development, streamline workflows, and enhance application performance."
 image: "../../assets/images/25/03/react-third-party-libraries.png"
-categories: ["web development", "javascript libraries"]
+categories: ["React"]
 authors: ["Brandford"]
-tags: ["react", "third-party libraries", "web development"]
+tags: ["react","web development"]
 canonical: "https://www.codetidehub.com/third-party-react-libraries/"
 ---
 
@@ -17,9 +17,10 @@ In recent times, React.js has become a game-changer in frontend development with
 
 Managing state in complex applications can be challenging. The following libraries provide robust solutions:
 
-- **Redux**: A predictable state container for JavaScript apps, Redux helps manage application state and logic outside the UI layer, making state mutations more predictable and traceable. citeturn0search2
+- **Redux**: A predictable state container for JavaScript apps, Redux helps manage application state and logic outside the UI layer, making state mutations more predictable and traceable.
+  With the release of Redux-Toolkit, state management with redux has become easier. Redux-Toolkit can be used to manage client-side state, while Redux-Toolkit Query can be used for server-side state management.
 
-- **MobX**: An alternative to Redux, MobX simplifies state management by using observables to automatically track and react to state changes, reducing boilerplate code. citeturn0search2
+- **MobX**: An alternative to Redux, MobX simplifies state management by using observables to automatically track and react to state changes, reducing boilerplate code.
 
 ## 2. UI Component Libraries
 

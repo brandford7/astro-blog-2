@@ -3,9 +3,9 @@ date: 2025-03-11T12:09:39Z
 title: "Next.js vs React: Choosing the Right Tool for Your Web Development Project"
 description: "An in-depth comparison between Next.js and React to help you determine the best choice for your web development needs."
 image: "../../assets/images/25/03/nextjs-vs-react.png"
-categories: ["web development", "javascript frameworks"]
+categories: ["React"]
 authors: ["Brandford"]
-tags: ["nextjs", "React", "framework comparison"]
+tags: ["nextjs","javascript","typescript","react"]
 canonical: "https://www.codetidehub.com/nextjs-vs-react/"
 ---
 

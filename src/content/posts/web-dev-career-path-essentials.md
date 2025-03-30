@@ -3,9 +3,9 @@ date: 2025-03-17T14:00:00Z
 title: "Navigating Your Web Development Career Path: A Roadmap for Success"
 description: "Explore different career paths in web development, from frontend and backend to full-stack, and learn how to build a successful career in tech."
 image: "../../assets/images/25/03/web-dev-career.png"
-categories: ["Web Development", "career growth"]
+categories: ["React"]
 authors: ["Brandford"]
-tags: ["Web development", "Career Guide", "Tech Jobs"]
+tags: ["nextjs","jobs"]
 canonical: "https://www.codetidehub.com/web-dev-career-path-essentials/"
 ---
 

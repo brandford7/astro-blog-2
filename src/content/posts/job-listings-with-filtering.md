@@ -3,9 +3,10 @@ date: 2025-03-17T14:00:00Z
 title: "Job Listings With Filtering: A Frontend Mentor Challenge"
 description: "Learn how to create a job listings app using React. Features include job filtering."
 image: "../../assets/images/25/03/job-listings-app.jpg"
-categories: ["Web Development", "React"]
+categories: ["React"]
 authors: ["Brandford"]
-tags: ["React", "Frontend Mentor", "Beginner Guide"]
+tags: ["nextjs","react","javascript","typescript"]
+series: ["React Tutorials", "1"]
 canonical: "https://www.codetidehub.com/job-listings-with-filtering/"
 ---
 
@@ -157,8 +158,8 @@ Let's start with our header.tsx component. The code for this component will look
 import React from "react";
 
 const Header = () => {
-  return 
- <div>Header</div>
+  return;
+  <div>Header</div>;
 };
 
 export default Header;
@@ -287,7 +288,6 @@ const JobCard = ({
 };
 
 export default JobCard;
-
 ```
 
 Next, let's work on the `filter.tsx` component.
@@ -337,7 +337,6 @@ const Filter = ({
 };
 
 export default Filter;
-
 ```
 
 Next, we will also need to work on the `page.tsx` which is the homepage of the web app.
@@ -347,36 +346,35 @@ Next, we will also need to work on the `page.tsx` which is the homepage of the w
 In `page.tsx`, we will add three functions, **addFilter**, **removeFilter**, and **clearFilter**. We will use react **useState** to handle adding, removing, and clearing filters. The code is below;
 
 ```tsx
- const [filters, setFilters] = useState<string[]>([]);
+const [filters, setFilters] = useState<string[]>([]);
 
-  const filteredJobs = jobs.filter((job) =>
-    filters.every(
-      (filter) =>
-        job.company.toLowerCase().includes(filter.toLowerCase()) ||
-        job.role.toLowerCase().includes(filter.toLowerCase()) ||
-        job.level.toLowerCase().includes(filter.toLowerCase()) ||
-        job.languages.includes(filter) ||
-        job.tools.includes(filter)
-    )
-  );
+const filteredJobs = jobs.filter((job) =>
+  filters.every(
+    (filter) =>
+      job.company.toLowerCase().includes(filter.toLowerCase()) ||
+      job.role.toLowerCase().includes(filter.toLowerCase()) ||
+      job.level.toLowerCase().includes(filter.toLowerCase()) ||
+      job.languages.includes(filter) ||
+      job.tools.includes(filter)
+  )
+);
 
-  const addFilter = (filter: string) => {
-    if (!filter.includes(filter.toLowerCase())) {
-      setFilters([...filters, filter]);
-    }
-  };
+const addFilter = (filter: string) => {
+  if (!filter.includes(filter.toLowerCase())) {
+    setFilters([...filters, filter]);
+  }
+};
 
-  const removeFilter = (filter: string) => {
-    setFilters(filters.filter((f) => f !== filter));
-  };
+const removeFilter = (filter: string) => {
+  setFilters(filters.filter((f) => f !== filter));
+};
 
-  const clearFilters = () => {
-    setFilters([]);
-  };
-
+const clearFilters = () => {
+  setFilters([]);
+};
 ```
 
-The final code of the `page.tsx` is below; 
+The final code of the `page.tsx` is below;
 
 ```tsx
 "use client";

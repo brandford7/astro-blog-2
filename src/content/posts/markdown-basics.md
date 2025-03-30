@@ -3,9 +3,9 @@ date: 2025-03-17T14:00:00Z
 title: "Markdown Basics: Bold Text, Indentation, File Format, and Strikethrough"
 description: "Learn essential Markdown formatting techniques, including bold text, indentation, strikethrough, and understanding the Markdown file format."
 image: "../../assets/images/25/03/markdown-basics.png"
-categories: ["web development", "markdown"]
+categories: ["Web Development"]
 authors: ["Brandford"]
-tags: ["Markdown", "Formatting", "Beginner Guide"]
+tags: ["nextjs"]
 canonical: "https://www.codetidehub.com/markdown-basics/"
 ---
 

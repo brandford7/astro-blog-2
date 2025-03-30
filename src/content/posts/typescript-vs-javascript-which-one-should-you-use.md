@@ -3,9 +3,9 @@ date: 2025-03-17T14:00:00Z
 title: "TypeScript vs JavaScript: Which One Should You Use in 2025?"
 description: "Learn the key differences between TypeScript and JavaScript, their pros and cons, and when to use each for web development."
 image: "../../assets/images/25/03/typescript-vs-javascript.png"
-categories: ["web development", "programming languages"]
+categories: ["Web Development"]
 authors: ["Brandford"]
-tags: ["TypeScript", "JavaScript", "Web Development"]
+tags: ["typescript", "javascript","web development"]
 canonical: "https://www.codetidehub.com/typescript-vs-javascript-which-one-should-you-use/"
 ---
 
@@ -120,8 +120,8 @@ function add(a: number, b: number): number {
   return a + b;
 }
 
-// console.log(add(5, "10")); // ❌ TypeScript will show an error at compile time
-console.log(add(5, 10)); // ✅ Output: 15
+// console.log(add(5, "10")); // TypeScript will show an error at compile time
+console.log(add(5, 10)); // Output: 15
 ```
 
 TypeScript ensures that both a and b must be numbers, preventing potential runtime errors.
