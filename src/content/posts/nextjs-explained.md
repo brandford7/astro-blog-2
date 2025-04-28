@@ -9,7 +9,6 @@ tags: [ "nextjs","typescript","javascript"]
 canonical: "https://www.codetidehub.com/nextjs-explained/"
 ---
 
-import YouTubeEmbed from "../../layouts/components/widgets/YouTubeEmbed.astro";
 
 Next.js has evolved significantly over the years—now offering powerful features via its new **App Router**. Whether you’re building SEO-friendly content sites, high-performance dashboards, or dynamic full-stack applications, Next.js streamlines your development process by integrating both frontend and backend capabilities into one cohesive framework.
 

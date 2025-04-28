@@ -9,7 +9,6 @@ tags: ["typescript", "javascript","web development"]
 canonical: "https://www.codetidehub.com/typescript-vs-javascript-which-one-should-you-use/"
 ---
 
-import YouTubeEmbed from "../../layouts/components/widgets/YouTubeEmbed.astro";
 
 JavaScript has been the backbone of web development for decades. But in recent years, **TypeScript** has gained massive popularity among developers. Is TypeScript just a better JavaScript, or does it serve a completely different purpose?
 

@@ -9,7 +9,6 @@ tags: ["nextjs","javascript","typescript","react"]
 canonical: "https://www.codetidehub.com/nextjs-vs-react/"
 ---
 
-import YouTubeEmbed from "../../layouts/components/widgets/YouTubeEmbed.astro";
 
 In the dynamic realm of web development, choosing the righ tools is crucial for building efficient and scalable applications. **React** and **Next.js** are two prominent technologies in this space, each offering unique features and benefits. Let's compare React and Next.js, highlighting their core differences, strengths, and ideal use cases to assist you in making an informed decision.
 

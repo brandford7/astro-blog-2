@@ -9,7 +9,6 @@ tags: ["web development"]
 canonical: "https://www.codetidehub.com/html-essentials-basic-things-you-need-to-know/"
 ---
 
-import YouTubeEmbed from "../../layouts/components/widgets/YouTubeEmbed.astro";
 
 HTML is the foundation of web development, and mastering its basics can help you build better websites, and grasp the basics of all these modern web frameworks. In this simple guide, we'll cover essential skills such as centering text and images, adding comments, linking CSS, and understanding why learning HTML is useful.
 

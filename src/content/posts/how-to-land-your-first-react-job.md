@@ -9,7 +9,6 @@ tags: ["react", "web development", "jobs"]
 canonical: "https://www.codetidehub.com/how-to-land-your-first-react-job/"
 ---
 
-import YouTubeEmbed from "../../layouts/components/widgets/YouTubeEmbed.astro";
 
 Securing your first React developer position in 2025 requires a strategic approach that combines technical proficiency, practical experience, and effective networking. This guide outlines actionable steps to help you navigate the journey toward landing your first React job.
 

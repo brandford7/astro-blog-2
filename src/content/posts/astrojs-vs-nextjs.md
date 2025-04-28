@@ -9,7 +9,6 @@ tags: ["nextjs", "typescript","javascript"]
 canonical: "https://www.codetidehub.com/astrojs-vs-nextjs/"
 ---
 
-import YouTubeEmbed from "../../layouts/components/widgets/YouTubeEmbed.astro";
 
 In the ever-evolving landscape of web development, choosing the right framework can significantly impact your project's success. Two prominent contenders in this space are **Astro JS** and **Next.js**. Both offer unique features and cater to different project requirements. This article delves into their core differences, strengths, and ideal use cases to guide you in making an informed decision.
 

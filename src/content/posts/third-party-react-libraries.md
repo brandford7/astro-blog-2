@@ -9,7 +9,6 @@ tags: ["react","web development"]
 canonical: "https://www.codetidehub.com/third-party-react-libraries/"
 ---
 
-import YouTubeEmbed from "../../layouts/components/widgets/YouTubeEmbed.astro";
 
 In recent times, React.js has become a game-changer in frontend development with its component-based architecture, allowing developers to build dynamic, and efficient user interfaces. React js is not just a javascript library so to enhance React applications, numerous third-party libraries have been developed, which offer solutions for state management, UI components, routing, and more. Using these libraries can significantly boost productivity and application performance. Below is a curated list of essential third-party libraries commonly used in React.js projects.
 

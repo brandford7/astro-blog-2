@@ -9,7 +9,6 @@ tags: ["nextjs"]
 canonical: "https://www.codetidehub.com/markdown-basics/"
 ---
 
-import YouTubeEmbed from "../../layouts/components/widgets/YouTubeEmbed.astro";
 
 Markdown is a **lightweight markup language** that makes text formatting simple and readable. Whether you're writing documentation, blogging, or creating content for static websites, Markdown helps you format text without complex HTML or rich-text editors.
 

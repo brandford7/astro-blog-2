@@ -9,7 +9,6 @@ tags: ["jobs"]
 canonical: "https://www.codetidehub.com/where-to-find-react-jobs/"
 ---
 
-import YouTubeEmbed from "../../layouts/components/widgets/YouTubeEmbed.astro";
 
 Are you a **React developer** looking for job opportunities? Whether you’re a **junior React developer**, an experienced engineer, or seeking **remote React jobs**, knowing where to look can make all the difference.
 
