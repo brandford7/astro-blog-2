@@ -207,7 +207,7 @@ try {
   try {
     return new URL(image, Astro.site || siteConfig.url).toString();
   } catch (e) {
-    const baseUrl = (Astro.site || siteConfig.url || 'https://bitdoze.com').replace(/\/$/, '');
+    const baseUrl = (Astro.site || siteConfig.url || 'https://codetidehub.com').replace(/\/$/, '');
     return `${baseUrl}/${image.replace(/^\//, '')}`;
   }
 })()} />
