@@ -9,6 +9,7 @@ tags: ["nextjs","jobs"]
 canonical: "https://www.codetidehub.com/web-dev-career-path-essentials/"
 ---
 
+import Adslot from '@components/ads/Adslot.astro'
 
 The world of **web development** is vast, dynamic, and filled with opportunities. But with so many technologies, job titles, and career paths, **where do you start?**
 

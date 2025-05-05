@@ -1,0 +1,20 @@
+---
+// src/components/AdSlot.astro
+const { id } = Astro.props;
+---
+
+<div id={`ad-slot-${id}`} >
+  <!-- Replace this with your actual ad code or Ezoic placeholders -->
+   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3825617756167561"
+     crossorigin="anonymous"></script>
+<ins class="adsbygoogle"
+     style="display:block; text-align:center;"
+     data-ad-layout="in-article"
+     data-ad-format="fluid"
+     data-ad-client="ca-pub-3825617756167561"
+     data-ad-slot="2800326649"></ins>
+<script is:inline>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+  
+</div>
