@@ -3,3 +3,5 @@ Allow: /
 
 Disallow: /api/*
 Disallow: /search/*
+
+Sitemap: https://codetidehub.com/sitemap-index.xml

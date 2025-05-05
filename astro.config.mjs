@@ -8,33 +8,42 @@ import path from 'path';
 
 import cloudflare from '@astrojs/cloudflare';
 
+import partytown from '@astrojs/partytown';
+
 // https://astro.build/config
 export default defineConfig({
   // Set the site URL for production
-  site: 'https://codetidehub.com',
+  site: "https://codetidehub.com",
 
   // Base path (set to '/' for most sites)
-  base: '/',
+  base: "/",
 
   // Configure Vite plugins and server settings
   vite: {
-    plugins: [
-      tailwindcss()
-    ],
+    plugins: [tailwindcss()],
     server: {
       fs: {
         allow: [
           // Allow the project root (default)
-          '.',
+          ".",
           // Allow the src/assets directory to fix the Vite serving error
-          path.resolve('./src/assets'),
+          path.resolve("./src/assets"),
         ],
       },
     },
   },
 
   // Configure Astro integrations
-  integrations: [mdx(), icon(), sitemap()],
+  integrations: [
+    mdx(),
+    icon(),
+    sitemap(),
+    partytown({
+      config: {
+        forward: ["dataLayer.push"],
+      },
+    }),
+  ],
 
-  adapter: cloudflare()
+  adapter: cloudflare(),
 });
