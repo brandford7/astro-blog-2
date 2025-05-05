@@ -28,6 +28,7 @@ export default defineConfig({
           ".",
           // Allow the src/assets directory to fix the Vite serving error
           path.resolve("./src/assets"),
+        path.resolve('./src/layouts/components')
         ],
       },
     },
