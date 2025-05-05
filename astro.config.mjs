@@ -8,7 +8,7 @@ import path from 'path';
 
 import cloudflare from '@astrojs/cloudflare';
 
-import partytown from '@astrojs/partytown';
+
 
 // https://astro.build/config
 export default defineConfig({
