@@ -106,7 +106,7 @@ While Angular is a powerful, all-in-one solution, many developers prefer Next.js
 
 ## **Who Uses Next.js ?**
 
-Next.js has become a preferred framework for numerous high-profile companies due to its performance, scalability, and developer-friendly features. Notable adopters include Netflix, Twitch, Uber, Nike, WhatsApp, Starbucks, Hulu, Walmart, Apple, TikTok, Lyft, and Spotify. citeturn0search0turn0search24
+Next.js has become a preferred framework for numerous high-profile companies due to its performance, scalability, and developer-friendly features. Notable adopters include Netflix, Twitch, Uber, Nike, WhatsApp, Starbucks, Hulu, Walmart, Apple, TikTok, Lyft, and Spotify.
 
 ---
 

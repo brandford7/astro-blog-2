@@ -54,7 +54,7 @@ Backend developers work on **servers, databases, and APIs**—essentially, every
 
 #### Skills Required
 
-**Programming Languages** – JavaScript/TypeScript (Node.js), Python, C#, or Java , GO 
+**Programming Languages** – JavaScript/TypeScript (Node.js), Python, C#, or Java , GO
 **Databases** – PostgreSQL, MySQL, MongoDB  
 **APIs & RESTful Services** – Connecting frontend to backend  
 **Authentication & Security** – JWT, OAuth, role-based access  
