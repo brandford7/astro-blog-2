@@ -38,11 +38,7 @@ export default defineConfig({
     mdx(),
     icon(),
     sitemap(),
-    partytown({
-      config: {
-        forward: ["dataLayer.push"],
-      },
-    }),
+    
   ],
 
   adapter: cloudflare(),
