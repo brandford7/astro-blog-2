@@ -1,0 +1,315 @@
+---
+date: 2025-05-09T12:09:39Z
+title: "How To Build A Simple Dashboard Using React And Tailwind CSS"
+description: "An in-depth comparison between Next.js and React to help you determine the best choice for your web development needs."
+image: "../../assets/images/25/05/sidebar-menu.png"
+categories: ["React"]
+authors: ["Brandford"]
+tags: ["nextjs", "javascript", "typescript", "react"]
+canonical: "https://www.codetidehub.com/how-to-create-a-sidebar-menu-with-react/"
+---
+
+In this tutorial, I will guide you to build a simple simple sidebar menu using React js, and Tailwind css, and React Router.
+
+## Installing React And Tailwind CSS
+
+### Installing React
+
+We will start by installing react with vite. Let's run the command below in our terminal
+
+```bash
+
+npm create vite@latest
+
+
+```
+
+Make sure you follow the subsequent instructions in the terminal to completely install React.
+
+### Installing Tailwind CSS
+
+Run the command below in your terminal to install tailwind css
+
+```bash
+npm install tailwindcss @tailwindcss/vite
+
+
+```
+
+When you're done , open your index.css file and add the following line of code at the top
+
+```css
+/*index.css */
+
+@import "tailwindcss";
+```
+
+Make sure your vite.config.ts, looks like the one below
+
+```ts
+//vite.config.ts
+
+import { defineConfig } from "vite";
+import tailwindcss from "@tailwindcss/vite";
+export default defineConfig({
+  plugins: [tailwindcss()],
+});
+```
+
+### Installing React Router
+
+Run the command below in your terminal
+
+```bash
+
+npm install react-router@latest
+
+```
+
+### Installing Lucide React
+
+Run the command below in your terminal
+
+```bash
+
+npm install lucide-react
+
+```
+
+## Creating Components and Pages For Our SideBar Menu
+
+Let's go to the src folder and create two folders and name one pages, and the other one components.
+
+### The Pages Folder
+
+In this folder, we will create files called `Dashboard.tsx`, `Users.tsx`, `Settings.tsx`,`Posts.tsx` and these will be our pages .
+The code in our pages files will look like the ones below;
+
+```tsx
+//Dashboard.tsx
+
+export const Dashboard = () => {
+  return <div> Dashboard</div>;
+};
+```
+
+```tsx
+//Users.tsx
+
+export const Users = () => {
+  return <div className="flex items-center justify-center">All Users </div>;
+};
+```
+
+```tsx
+//Settings.tsx
+
+export const Settings = () => {
+  return <div className="flex items-center justify-center">Settings Page </div>;
+};
+```
+
+```tsx
+//Posts.tsx
+
+export const Posts = () => {
+  return <div className="flex items-center justify-center">Posts </div>;
+};
+```
+
+**Note: You might see different contents in your pages.**
+
+## Configure React Router for the project
+
+Remove all the code in your App.tsx and paste this code
+
+```tsx
+// App.tsx
+
+import {Users} from "./pages/Users";
+import {Posts} from "./pages/Posts";
+import {Settings} from "./pages/Settings";
+import {Layout} from "./components/Layout";
+import {Dashboard} from "./pages/Dashboard";
+
+
+export default function App(){
+
+return(
+
+<Routes>
+
+<Route element={<Layout />}>
+  <Route path="dashboard" element={<Dashboard />} />
+  <Route path="posts" element={<Posts />} />
+  <Route path="users" element={<Profile />} />
+
+  <Route path="settings" element={<Settings />} />
+</Route>
+
+
+    </Routes>
+
+</Routes>
+)
+}
+
+```
+
+Let's now create a shared Layout for the pages. We can do this by creating a new file in the components folder,
+and name it Layout.tsx.
+
+import React from "react";
+
+```tsx
+import React from "react";
+import { Outlet } from "react-router";
+import {SideBar} from "./SideBar.tsx
+
+const Layout = () => {
+  <div className="flex flex-row">
+    <Sidebar />
+    <Outlet />
+  </div>;
+};
+```
+
+## Setting Up The main.tsx
+
+Now, let's go to the main.tsx menu and make sure we have this code there
+
+```tsx
+
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import {BrowserRouter}  from 'react-router'
+import "./index.css";
+
+import App from "./App";
+
+createRoot(document.getElementById("root")!).render(
+
+{" "}
+
+<StrictMode>
+  <App />
+</StrictMode>
+);
+
+```
+
+### Final Code
+
+Create a file called SideBar.tsx this will be our Sidebar menu component.
+Copy and paste the code below into your SideBar.tsx and remove the old code.
+
+```tsx
+//Sidebar.tsx
+
+import {
+  FileText,
+  LayoutDashboard,
+  Settings,
+  Users,
+  Menu,
+  X,
+} from "lucide-react";
+import { useState } from "react";
+import { Link, useLocation } from "react-router"; // ensure you're using react-router-dom
+
+interface NavItem {
+  title: string;
+  href: string;
+  icon: React.ReactNode;
+}
+
+const navItems: NavItem[] = [
+  {
+    title: "Dashboard",
+    href: "/dashboard",
+    icon: <LayoutDashboard className="h-5 w-5" />,
+  },
+  {
+    title: "Users",
+    href: "/users",
+    icon: <Users className="h-5 w-5" />,
+  },
+  {
+    title: "Posts",
+    href: "/posts",
+    icon: <FileText className="h-5 w-5" />,
+  },
+  {
+    title: "Settings",
+    href: "/settings",
+    icon: <Settings className="h-5 w-5" />,
+  },
+];
+
+export const SideBar = () => {
+  const location = useLocation();
+  const [open, setOpen] = useState(true);
+
+  const pathname = location.pathname;
+
+  return (
+    <div className="flex">
+      {/* Toggle Button */}
+      <button
+        type="button"
+        className="absolute top-4 left-4 z-50 bg-gray-200 p-2 rounded-md md:hidden"
+        onClick={() => setOpen(!open)}
+      >
+        {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+      </button>
+
+      {/* Sidebar */}
+      <aside
+        className={
+          `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-100 ` +
+          `${
+            pathname === item.href || pathname.startsWith(`${item.href}/`)
+              ? "bg-gray-200"
+              : ""
+          }`
+        }
+      >
+        <div className="p-5">
+          <h2 className="text-lg font-bold mb-6">My App</h2>
+          <ul className="space-y-2">
+            {navItems.map((item) => (
+              <li key={item.href}>
+                <Link
+                  to={item.href}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-100",
+                    pathname === item.href ||
+                      pathname?.startsWith(`${item.href}/`)
+                      ? "bg-gray-200"
+                      : ""
+                  )}
+                >
+                  {item.icon}
+                  <span>{item.title}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <main className="flex-1 ml-0 md:ml-64 p-6 transition-all duration-300">
+        <h1 className="text-2xl font-bold">Main Content Here</h1>
+      </main>
+    </div>
+  );
+};
+```
+
+## Conclusion
+
+Now we have a very beautiful sidebar menu
+
+Your final dashboard will look like this
