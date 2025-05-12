@@ -5,8 +5,8 @@ import mdx from "@astrojs/mdx";
 import icon from "astro-icon";
 import sitemap from "@astrojs/sitemap";
 import path from "path";
-
-import cloudflare from "@astrojs/cloudflare";
+import netlify from "@astrojs/netlify";
+//import cloudflare from "@astrojs/cloudflare";
 
 // https://astro.build/config
 export default defineConfig({
@@ -33,6 +33,8 @@ export default defineConfig({
 
   // Configure Astro integrations
   integrations: [mdx(), icon(), sitemap()],
-
-  adapter: cloudflare(),
+  adapter: netlify({
+    edgeMiddleware: true,
+  }),
+  //adapter: cloudflare(),
 });
