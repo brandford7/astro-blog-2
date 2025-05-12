@@ -34,7 +34,7 @@ export default defineConfig({
   // Configure Astro integrations
   integrations: [mdx(), icon(), sitemap()],
   adapter: netlify({
-    //edgeMiddleware: true,
+    edgeMiddleware: true,
   }),
   //adapter: cloudflare(),
 });
