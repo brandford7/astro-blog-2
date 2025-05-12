@@ -8,6 +8,8 @@ import path from "path";
 //import netlify from "@astrojs/netlify";
 import cloudflare from "@astrojs/cloudflare";
 
+import partytown from "@astrojs/partytown";
+
 // https://astro.build/config
 export default defineConfig({
   // Set the site URL for production
@@ -32,9 +34,7 @@ export default defineConfig({
   },
 
   // Configure Astro integrations
-  integrations: [mdx(), icon(), sitemap()],
-  /*adapter: netlify({
-    edgeMiddleware: true,
-  }),*/
+  integrations: [mdx(), icon(), sitemap(), partytown()],
+  
   adapter: cloudflare(),
 });
