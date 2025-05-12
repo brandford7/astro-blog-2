@@ -8,7 +8,6 @@ import path from "path";
 //import netlify from "@astrojs/netlify";
 import cloudflare from "@astrojs/cloudflare";
 
-import partytown from "@astrojs/partytown";
 
 // https://astro.build/config
 export default defineConfig({
@@ -34,7 +33,7 @@ export default defineConfig({
   },
 
   // Configure Astro integrations
-  integrations: [mdx(), icon(), sitemap(), partytown()],
+  integrations: [mdx(), icon(), sitemap(),],
   
   adapter: cloudflare(),
 });
