@@ -9,6 +9,7 @@ import SocialShare from '@layouts/components/blog/SocialShare.astro';
 import SeriesNav from '@layouts/components/widgets/SeriesNav.astro';
 import ReadingProgress from '@layouts/components/blog/ReadingProgress.astro';
 import Breadcrumb from '@layouts/components/common/Breadcrumb.astro';
+import DisplayAds from '@components/widgets/DisplayAds.astro';
 
 const { post, headings } = Astro.props;
 const { title, description, image, date, categories, authors, tags } = post.data;
@@ -159,10 +160,11 @@ breadcrumbs.push({ name: title, url: canonicalURL });
     <!-- Post Content -->
     <div class="prose prose-lg dark:prose-invert prose-blue prose-headings:font-bold prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-img:rounded-lg w-full !max-w-none" style="min-height: 200px;">
   
-  
+  <DisplayAds/>
 
       
       <slot />
+      <DisplayAds/>
     </div>
     
     <!-- Social Share Component -->

@@ -4,6 +4,7 @@ import Header from "@components/common/Header.astro";
 import Footer from "@components/common/Footer.astro";
 import SEO from "@components/common/SEO.astro";
 import faviconSVG from "@assets/favicons/favicon.svg";
+import DisplayAds from "@components/widgets/DisplayAds.astro";
 // Import favicon from public directory instead of assets
 
 interface Props {
@@ -231,7 +232,7 @@ const {
       </div>
     </main>
     
-
+<DisplayAds/>
     <!-- Full-width footer -->
     <Footer />
   </body>
