@@ -5,7 +5,7 @@ import PostCard from '@components/blog/PostCard.astro';
 import Pagination from '@components/common/Pagination.astro';
 import { getPagination } from '@utils/pagination';
 import { siteConfig } from '@config/site';
-import InFeedAd from '@components/widgets/InFeedAd.astro';
+
 
 export async function getStaticPaths({ paginate }) {
   const posts = await getCollection('posts', ({ data }) => {
@@ -85,7 +85,7 @@ const formattedTag = tag.charAt(0).toUpperCase() + tag.slice(1);
     </header>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <InFeedAd/>
+      
       {paginatedPosts.map((post) => (
         <PostCard post={post} />
       ))}

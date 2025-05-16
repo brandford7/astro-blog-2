@@ -5,7 +5,7 @@
     "base_path": "/",
     "trailing_slash": true,
     "favicon": "../favicon",
-    "logo": "/bitdoze_logo_better.png",
+    "logo": "/codetidehub-logo.svg",
     "logo_width": "200",
     "logo_height": "30",
     "logo_text": "codetidehub logo"
