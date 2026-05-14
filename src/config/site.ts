@@ -1,10 +1,10 @@
 // Site configuration
 export const siteConfig = {
   // Site details
-  name: "CodeTideHub",
+  name: "BrandfordTech",
   description:
     "Discover the latest news and insights on Web Development, javascript,typescript, and anything Reactjs.",
-  url: "https://codetidehub.com",
+  url: "https://brandfordtech.com",
 
   // Pagination settings
   postsPerPage: 10, // Number of posts per page

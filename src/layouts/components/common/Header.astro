@@ -2,7 +2,8 @@
 import ThemeToggle from "./ThemeToggle.astro";
 import { Image } from "astro:assets";
 import menu from "@config/menu.json";
-import mylogo from "@assets/favicons/codetidehub-logo.svg";
+import mylogo from "@assets/favicons/brandfordtech-logo-lockup.svg";
+import darklogo from "@assets/favicons/brandfordtech-logo-dark.svg";
 
 // Extract main menu items
 const mainMenu = menu.main;
@@ -14,15 +15,21 @@ const mainMenu = menu.main;
       <!-- Logo -->
       <div class="flex-shrink-0 flex items-center">
         <a href="/" class="flex items-center">
-          <Image 
-            src={mylogo} 
-            alt="CodeTideHub Logo" 
-            width={140} 
-            height={140} 
-            class="mr-2"
-            priority
-          />
-        </a>
+  <!-- light mode logo -->
+  <Image
+    src={mylogo}
+    alt="BrandfordTech"
+    height="36"
+    class="block dark:hidden"
+  />
+  <!-- dark mode logo -->
+  <Image
+    src={darklogo}
+    alt="BrandfordTech"
+    height="36"
+    class="hidden dark:block"
+  />
+</a>
       </div>
 
       <!-- Mobile menu button -->

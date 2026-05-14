@@ -1,14 +1,14 @@
 {
   "site": {
-    "title": "CodeTideHub",
-    "base_url": "https://www.codetidehub.com",
+    "title": "BrandfordTech",
+    "base_url": "https://www.brandfordtech.com",
     "base_path": "/",
     "trailing_slash": true,
     "favicon": "../favicon",
-    "logo": "/codetidehub-logo.svg",
+    "logo": "/brandfordtech-logo-lockup.svg",
     "logo_width": "200",
     "logo_height": "30",
-    "logo_text": "codetidehub logo"
+    "logo_text": "brandfordtech logo"
   },
 
   "settings": {

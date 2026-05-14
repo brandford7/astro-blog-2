@@ -4,4 +4,4 @@ Allow: /
 Disallow: /api/*
 Disallow: /search/*
 
-Sitemap: https://codetidehub.com/sitemap-index.xml
+Sitemap: https://brandfordtech.com/sitemap-index.xml

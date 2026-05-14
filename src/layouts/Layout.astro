@@ -26,8 +26,8 @@ interface Props {
 }
 
 const { 
-  title = "CodeTideHub - Web Development Tutorials and Resources",
-  description = "Discover the latest news and insights on Web Development, javascript,typescript, and anything Reactjs.",
+  title = "BrandfordTech - Web Development Tutorials and Resources",
+  description = "Discover the latest news and insights on Backend Development, javascript,typescript, and anything Nest js",
   image = "/images/default-og.jpg",
   noindex = false,
   wideContent = false,
@@ -61,8 +61,9 @@ const {
  
 
 <!--Grow script -->
+{import.meta.env.PROD && (
  <script is:inline data-grow-initializer="">!(function(){window.growMe||((window.growMe=function(e){window.growMe._.push(e);}),(window.growMe._=[]));var e=document.createElement("script");(e.type="text/javascript"),(e.src="https://faves.grow.me/main.js"),(e.defer=!0),e.setAttribute("data-grow-faves-site-id","U2l0ZTozOGUyYWE5My00ZGE1LTQyOTUtYTVlZi02YmVhOTA0ZDRmMzc=");var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t);})();</script>
-  
+)}
   <head>
     <meta charset="UTF-8" />
     
@@ -76,11 +77,14 @@ const {
     <meta name="generator" content={Astro.generator} />
 
      <!--Google Adsense -->
- 
+ {import.meta.env.PROD && (
      <script is:inline async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3825617756167561"
      crossorigin="anonymous"></script>
+ )}
 
 <!--Google Analytics -->  
+
+{import.meta.env.PROD && (
     <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-724JNXPRWQ"></script>
 
 <script is:inline>
@@ -90,7 +94,7 @@ const {
 
   gtag('config', 'G-724JNXPRWQ');
 </script>
-   
+)}
     
     <!-- Critical CSS to prevent FOUC -->
     <style is:inline>

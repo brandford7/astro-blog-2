@@ -1,0 +1,59 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 80" width="600" height="80">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="acGrad" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Favicon icon -->
+  <g transform="translate(0, 12)">
+    <rect width="56" height="56" rx="12" fill="url(#bgGrad)"/>
+    <!-- Left bracket -->
+    <path d="M11 17.5 L5 28 L11 38.5" stroke="url(#acGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <!-- Right bracket -->
+    <path d="M45 17.5 L51 28 L45 38.5" stroke="url(#acGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <!-- B -->
+    <path d="M18 17 L18 39 M18 17 L23.5 17 Q27.5 17 27.5 23 Q27.5 28 18 28 M18 28 L24 28 Q29 28 29 34 Q29 39 24 39 L18 39"
+      stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <!-- T -->
+    <path d="M33 17 L43 17 M38 17 L38 39"
+      stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <!-- Accent dot -->
+    <circle cx="49" cy="47" r="2.5" fill="url(#acGrad)"/>
+  </g>
+
+  <!-- Wordmark -->
+  <!-- "brandford" -->
+  <text
+    x="72"
+    y="54"
+    font-family="'SF Pro Display', 'Inter', 'Helvetica Neue', Arial, sans-serif"
+    font-size="46"
+    font-weight="700"
+    letter-spacing="-1.5"
+    fill="#0F172A"
+  >brandford</text>
+
+  <!-- "tech" in gradient -->
+  <text
+    x="374"
+    y="54"
+    font-family="'SF Pro Display', 'Inter', 'Helvetica Neue', Arial, sans-serif"
+    font-size="46"
+    font-weight="700"
+    letter-spacing="-1.5"
+    fill="url(#textGrad)"
+  >tech</text>
+
+  <!-- Trailing dot -->
+  <circle cx="570" cy="51" r="4.5" fill="url(#textGrad)"/>
+</svg>

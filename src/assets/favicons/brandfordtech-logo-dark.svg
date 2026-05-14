@@ -1,0 +1,36 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 80" width="520" height="80">
+  <defs>
+    <linearGradient id="techGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Dark bg pill -->
+  <rect width="520" height="80" rx="12" fill="#0F172A"/>
+
+  <!-- "brandford" in white -->
+  <text
+    x="16"
+    y="54"
+    font-family="'SF Pro Display', 'Inter', 'Helvetica Neue', Arial, sans-serif"
+    font-size="48"
+    font-weight="700"
+    letter-spacing="-1.5"
+    fill="#F8FAFC"
+  >brandford</text>
+
+  <!-- "tech" in gradient -->
+  <text
+    x="321"
+    y="54"
+    font-family="'SF Pro Display', 'Inter', 'Helvetica Neue', Arial, sans-serif"
+    font-size="48"
+    font-weight="700"
+    letter-spacing="-1.5"
+    fill="url(#techGrad)"
+  >tech</text>
+
+  <!-- Accent dot -->
+  <circle cx="502" cy="51" r="5" fill="url(#techGrad)"/>
+</svg>

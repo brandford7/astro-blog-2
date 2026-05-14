@@ -12,7 +12,7 @@ import cloudflare from "@astrojs/cloudflare";
 // https://astro.build/config
 export default defineConfig({
   // Set the site URL for production
-  site: "https://codetidehub.com",
+  site: "https://brandfordtech.com",
 
   // Base path (set to '/' for most sites)
   base: "/",
@@ -33,7 +33,7 @@ export default defineConfig({
   },
 
   // Configure Astro integrations
-  integrations: [mdx(), icon(), sitemap(),],
-  
+  integrations: [mdx(), icon(), sitemap()],
+
   adapter: cloudflare(),
 });

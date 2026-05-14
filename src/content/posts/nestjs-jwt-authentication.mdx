@@ -1,0 +1,546 @@
+---
+date: 2026-05-20T12:00:00Z
+title: "JWT Authentication in NestJS: Complete Guide with Real Code"
+description: "Learn how to implement JWT authentication in NestJS from scratch — registration, login, protected routes, and Guards — with real working code every step of the way."
+image: "../../assets/images/26/05/nestjs-jwt-authentication.png"
+categories: ["backend development", "NestJS"]
+authors: ["Brandford"]
+tags: ["NestJS", "JWT", "authentication", "TypeScript", "backend", "Node.js"]
+canonical: "https://brandfordtech.com/nestjs-jwt-authentication/"
+---
+
+Authentication is the thing that turns a toy project into a real one.
+
+And honestly, it's where a lot of developers get stuck with NestJS. It's not because NestJS makes it hard, but it actually makes it pretty clean once you understand the pieces. But the docs assume you already know Passport.js, and most tutorials skip straight to the "add this decorator and it works" part without explaining what's actually happening under the hood.
+
+This article doesn't do that. We're building JWT auth from scratch — registration, login, token generation, and protected routes — and I'll explain every piece as we go.
+
+>  **Prerequisites**: This builds on the previous two articles in this series. You should understand [NestJS modules, controllers, and services](/nestjs-modules-controllers-services) before continuing. You don't need prior Passport.js experience.
+
+>  **What we're building**: A working auth system with user registration, login that returns a JWT, and route protection using Guards. We'll use `@nestjs/jwt` and `@nestjs/passport` with the `passport-jwt` strategy. Database integration is kept simple (in-memory) so we can focus on the auth logic — swapping in TypeORM or Prisma is straightforward once this foundation is in place.
+
+---
+
+## How JWT Auth Works in NestJS (The Mental Model First)
+
+Before touching any code, let me give you the flow. This is what we're building:
+
+```
+1. User registers → we hash their password and save it
+2. User logs in → we verify their password, then issue a JWT
+3. User makes a protected request → they send the JWT in the Authorization header
+4. NestJS validates the token → if valid, the request goes through. If not, 401.
+```
+
+In NestJS, step 4 is handled by a **Guard**. Think of a Guard as a bouncer at the door — every request passes through it, and it decides whether to let the request continue or reject it outright.
+
+If you've used Express, a Guard is like auth middleware, but with a clearer purpose and much better TypeScript support.
+
+---
+
+## Project Setup
+
+Let's start fresh. If you already have a NestJS project, skip this.
+
+```bash
+npm i -g @nestjs/cli
+nest new nestjs-jwt-auth
+cd nestjs-jwt-auth
+```
+
+Now install the packages we need:
+
+```bash
+npm install @nestjs/jwt @nestjs/passport passport passport-jwt bcrypt
+npm install -D @types/passport-jwt @types/bcrypt
+```
+
+Here's what each one does:
+
+- `@nestjs/jwt` — NestJS wrapper for the `jsonwebtoken` library
+- `@nestjs/passport` — NestJS integration for Passport.js
+- `passport` — the underlying auth library NestJS integrates with
+- `passport-jwt` — the Passport strategy for validating JWTs
+- `bcrypt` — for hashing passwords (never store plain text passwords)
+
+---
+
+## Step 1: Create the Users Module
+
+We need somewhere to store users. Let's generate the module:
+
+```bash
+nest generate module users
+nest generate service users
+```
+
+We'll keep the user model simple for now:
+
+```typescript
+// users/user.interface.ts
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  password: string; // this will always be a bcrypt hash — never plain text
+}
+```
+
+Now the service. This is where users get created and looked up:
+
+```typescript
+// users/users.service.ts
+import { Injectable, ConflictException } from '@nestjs/common';
+import { User } from './user.interface';
+
+@Injectable()
+export class UsersService {
+  // In-memory store — swap this for a real DB later
+  private users: User[] = [];
+
+  async findByEmail(email: string): Promise<User | undefined> {
+    return this.users.find(user => user.email === email);
+  }
+
+  async findById(id: string): Promise<User | undefined> {
+    return this.users.find(user => user.id === id);
+  }
+
+  async create(name: string, email: string, hashedPassword: string): Promise<User> {
+    const existing = await this.findByEmail(email);
+
+    if (existing) {
+      // 409 Conflict — this email is already registered
+      throw new ConflictException('An account with this email already exists');
+    }
+
+    const user: User = {
+      id: crypto.randomUUID(),
+      name,
+      email,
+      password: hashedPassword,
+    };
+
+    this.users.push(user);
+    return user;
+  }
+}
+```
+
+And the module — make sure to export `UsersService` so `AuthModule` can use it:
+
+```typescript
+// users/users.module.ts
+import { Module } from '@nestjs/common';
+import { UsersService } from './users.service';
+
+@Module({
+  providers: [UsersService],
+  exports: [UsersService], // AuthModule needs this
+})
+export class UsersModule {}
+```
+
+---
+
+## Step 2: Create the Auth Module
+
+```bash
+nest generate module auth
+nest generate controller auth
+nest generate service auth
+```
+
+The auth module is where the real auth logic lives. Generate a `.env` file first — we never hardcode secrets:
+
+```bash
+# .env
+JWT_SECRET=your-super-secret-key-change-this-in-production
+JWT_EXPIRES_IN=7d
+```
+
+Now install `@nestjs/config` to read it:
+
+```bash
+npm install @nestjs/config
+```
+
+### The DTOs
+
+Two DTOs — one for registration, one for login:
+
+```typescript
+// auth/dto/register.dto.ts
+import { IsEmail, IsString, MinLength } from 'class-validator';
+
+export class RegisterDto {
+  @IsString()
+  name: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  @MinLength(8, { message: 'Password must be at least 8 characters' })
+  password: string;
+}
+```
+
+```typescript
+// auth/dto/login.dto.ts
+import { IsEmail, IsString } from 'class-validator';
+
+export class LoginDto {
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  password: string;
+}
+```
+
+### The Auth Service
+
+This is the core of everything. Registration hashes the password, login verifies it and returns a token:
+
+```typescript
+// auth/auth.service.ts
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { UsersService } from '../users/users.service';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async register(dto: RegisterDto) {
+    // Hash the password — never store plain text
+    // 10 is the salt rounds — higher is more secure but slower
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    const user = await this.usersService.create(dto.name, dto.email, hashedPassword);
+
+    // Don't return the password hash — ever
+    const { password, ...result } = user;
+    return result;
+  }
+
+  async login(dto: LoginDto) {
+    const user = await this.usersService.findByEmail(dto.email);
+
+    // Use a vague error message — don't tell attackers whether the email exists
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const passwordMatches = await bcrypt.compare(dto.password, user.password);
+
+    if (!passwordMatches) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // The JWT payload — keep it small, this gets encoded in every token
+    const payload = { sub: user.id, email: user.email };
+
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    };
+  }
+
+  async validateUser(userId: string) {
+    // Called by the JWT strategy on every protected request
+    return this.usersService.findById(userId);
+  }
+}
+```
+
+Two things worth highlighting here.
+
+**The vague error message on login**: `'Invalid credentials'` covers both "email not found" and "wrong password." If you send different errors for each case, an attacker can enumerate valid emails in your system. One generic message for both.
+
+**Stripping the password from the register response**: We destructure `password` out and return `result`. Accidentally leaking a bcrypt hash in an API response is a bad day — get in the habit of never including it.
+
+### The JWT Strategy
+
+This is the Passport strategy that validates incoming tokens on protected routes:
+
+```typescript
+// auth/jwt.strategy.ts
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { AuthService } from './auth.service';
+
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(
+    private readonly authService: AuthService,
+    configService: ConfigService,
+  ) {
+    super({
+      // Extract the token from the Authorization: Bearer <token> header
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: configService.get<string>('JWT_SECRET'),
+    });
+  }
+
+  async validate(payload: { sub: string; email: string }) {
+    // payload is the decoded JWT — sub is the user id we put in during login
+    const user = await this.authService.validateUser(payload.sub);
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    // Whatever we return here gets attached to req.user
+    const { password, ...result } = user;
+    return result;
+  }
+}
+```
+
+The `validate()` method runs automatically on every protected request. Passport calls it after verifying the token signature. What you return here gets attached to `request.user` — so inside any protected controller, `req.user` is the authenticated user.
+
+### The Auth Guard
+
+The Guard is what actually protects routes. We define it once and apply it wherever we want:
+
+```typescript
+// auth/jwt-auth.guard.ts
+import { Injectable } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {}
+```
+
+That's genuinely the whole file. `AuthGuard('jwt')` wires up to the `JwtStrategy` we just defined and handles all the validation logic for us.
+
+### The Auth Controller
+
+```typescript
+// auth/auth.controller.ts
+import { Controller, Post, Body, HttpCode } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  @Post('register') // POST /auth/register
+  register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
+  }
+
+  @Post('login') // POST /auth/login
+  @HttpCode(200) // override default 201 — login isn't creating a resource
+  login(@Body() dto: LoginDto) {
+    return this.authService.login(dto);
+  }
+}
+```
+
+### The Auth Module
+
+Now wire everything together:
+
+```typescript
+// auth/auth.module.ts
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { JwtStrategy } from './jwt.strategy';
+import { UsersModule } from '../users/users.module';
+
+@Module({
+  imports: [
+    UsersModule, // gives us access to UsersService
+    PassportModule,
+    ConfigModule,
+    JwtModule.registerAsync({
+      // registerAsync lets us inject ConfigService to read the secret from .env
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') },
+      }),
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [AuthService, JwtStrategy],
+})
+export class AuthModule {}
+```
+
+---
+
+## Step 3: Update AppModule
+
+```typescript
+// app.module.ts
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }), // makes ConfigService available everywhere
+    AuthModule,
+    UsersModule,
+  ],
+})
+export class AppModule {}
+```
+
+And add `ValidationPipe` globally in `main.ts`:
+
+```typescript
+// main.ts
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  // whitelist: true strips any properties not in your DTO — a security win
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+---
+
+## Step 4: Protecting Routes with the Guard
+
+Now the payoff. Any route you want to protect, just add `@UseGuards(JwtAuthGuard)`:
+
+```typescript
+// users/users.controller.ts
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Request } from 'express';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { UsersService } from './users.service';
+
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Get('me') // GET /api/users/me — protected
+  @UseGuards(JwtAuthGuard)
+  getMe(@Req() req: Request) {
+    // req.user is set by our JwtStrategy.validate() method
+    return req.user;
+  }
+}
+```
+
+You can also protect an entire controller at once by putting the decorator on the class instead of the method:
+
+```typescript
+@Controller('users')
+@UseGuards(JwtAuthGuard) // every route in this controller is now protected
+export class UsersController {}
+```
+
+---
+
+## Testing It
+
+Start the server:
+
+```bash
+npm run start:dev
+```
+
+**Register:**
+```bash
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Brandford", "email": "brandford@example.com", "password": "securepass123"}'
+```
+
+**Login:**
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "brandford@example.com", "password": "securepass123"}'
+
+# Response:
+# { "access_token": "eyJhbGci...", "user": { "id": "...", "name": "Brandford", ... } }
+```
+
+**Access a protected route:**
+```bash
+curl http://localhost:3000/api/users/me \
+  -H "Authorization: Bearer eyJhbGci..."
+```
+
+Send a request without the token and you'll get a 401. Send a tampered token and you'll get a 401. Send an expired token — 401. The Guard handles all of it.
+
+---
+
+## Common Mistakes With JWT Auth in NestJS
+
+**Hardcoding the JWT secret**
+
+```typescript
+// ❌ Never do this
+secret: 'mysecret123'
+
+// ✅ Always read from environment
+secret: configService.get<string>('JWT_SECRET')
+```
+
+If that secret ends up in version control, every token you've ever issued is compromised.
+
+**Forgetting `JwtStrategy` in providers**
+
+The strategy is an `@Injectable()` class — it needs to be in the `providers` array of `AuthModule`. Forget it and the Guard silently fails to work.
+
+**Putting sensitive data in the JWT payload**
+
+The JWT payload is base64 encoded, not encrypted. Anyone can decode it — they just can't tamper with it without invalidating the signature. Don't put passwords, full user objects, or anything sensitive in the payload.
+
+```typescript
+// ❌ Too much — and password hash in a JWT is a serious mistake
+const payload = { sub: user.id, email: user.email, password: user.password, role: user.role };
+
+// ✅ Just what you need to identify the user
+const payload = { sub: user.id, email: user.email };
+```
+
+---
+
+## What's Next
+
+You now have a working JWT auth system. Users can register, log in, and access protected routes. The foundation is solid.
+
+The next step in this series is **role-based access control** — how to restrict certain routes to admins only, and how NestJS handles that cleanly with custom decorators and Guards. [TODO: link when published]
+
+Drop your questions in the comments. If something didn't work or a step wasn't clear, let me know and I'll update the article.
+
+---
+
+> **Meta description**: Build JWT authentication in NestJS from scratch — registration, login, token generation, and protected routes with Guards. Real code, no hand-waving.

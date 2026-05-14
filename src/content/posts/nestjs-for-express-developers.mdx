@@ -6,7 +6,7 @@ image: "../../assets/images/26/05/nestjs-for-express-developers.jpg"
 categories: ["backend development", "NestJS"]
 authors: ["Brandford"]
 tags: ["NestJS", "Express", "Node.js", "TypeScript", "backend"]
-canonical: "https://www.codetidehub1.pages.dev/nestjs-for-express-developers/"
+canonical: "https://www.brandfordtech.com/nestjs-for-express-developers/"
 ---
 
 You've built APIs with Express. You know `app.use()`, you know `req` and `res`, you know how to wire up a route and send back some JSON. Express clicks for you — it's simple, flexible, and gets out of your way.
@@ -141,9 +141,8 @@ app.use((req, res, next) => {
 
 NestJS supports Express-style middleware too, and you can apply it the same way for global concerns. But NestJS also introduces more specialized tools that do what middleware does, but more explicitly:
 
-| Express pattern | NestJS equivalent | What it's for |
-| --------------- | ----------------- | ------------- |
-
+| Express Pattern | NestJS Equivalent | What it's for |
+| :--- | :--- | :--- |
 | `app.use(authMiddleware)` | **Guards** (`@UseGuards()`) | Authentication & authorization |
 | `app.use(loggerMiddleware)` | **Interceptors** (`@UseInterceptors()`) | Logging, response transformation, timing |
 | `app.use(validateMiddleware)` | **Pipes** (`@UsePipes()`) | Input validation and transformation |
