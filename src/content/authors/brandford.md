@@ -13,8 +13,8 @@ My name is Brandford, and I’m a passionate software developer with about four 
 I specialize in frontend development, primarily working with React, and Next.js to build engaging and user-friendly applications. Additionally, I have experience in:
 
 Languages: TypeScript, JavaScript, C#, X++
-Frontend Technologies: React, NextJS, Astro, Sanity CMS
-Backend Technologies: Node.js, ASP.NET, Mongodb,Expressjs
+Frontend Technologies: React, NextJS,
+Backend Technologies: Node.js, ASP.NET, Mongodb,Express JS, Nest JS
 ERP Systems Microsoft Dynamics AX 2012 (development & functional experience)
 
 Education

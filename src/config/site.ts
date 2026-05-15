@@ -17,5 +17,5 @@ export const siteConfig = {
   },
 
   // Default social image
-  defaultImage: "/images/default-og.jpg",
+  defaultImage: "/images/og-icon.png",
 };
