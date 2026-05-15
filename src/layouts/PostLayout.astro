@@ -9,6 +9,7 @@ import SocialShare from '@layouts/components/blog/SocialShare.astro';
 import SeriesNav from '@layouts/components/widgets/SeriesNav.astro';
 import ReadingProgress from '@layouts/components/blog/ReadingProgress.astro';
 import Breadcrumb from '@layouts/components/common/Breadcrumb.astro';
+import Comments from '@components/common/Comments.astro';
 
 
 const { post, headings } = Astro.props;
@@ -174,8 +175,24 @@ breadcrumbs.push({ name: title, url: canonicalURL });
       url={canonicalURL}
     />
 
+  <!--Newly added code-->
+    <!--  Continue The Series  -->
+<div class="my-8 p-5 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+  <p class="font-semibold text-slate-800 dark:text-white mb-1">
+    Continue the series →
+  </p>
+  <p class="text-sm text-slate-600 dark:text-slate-400">
+    Next up: NestJS Modules, Controllers and Services — the architecture finally explained.
+  </p>
+  <a href="/nestjs-modules-controllers-services/" 
+     class="inline-block mt-3 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+    Read next article →
+  </a>
+</div>
    
     <!-- Related Posts -->
     <RelatedPosts currentPost={post} />
   </article>
+  <!-- Comments Section -->
+  <Comments />
 </Layout>

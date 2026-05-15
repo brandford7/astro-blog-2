@@ -16,6 +16,7 @@ export default defineConfig({
 
   // Base path (set to '/' for most sites)
   base: "/",
+  
 
   // Configure Vite plugins and server settings
   vite: {
