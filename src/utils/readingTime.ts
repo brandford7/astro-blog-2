@@ -15,6 +15,7 @@ export function getReadingTime(text: string, wordsPerMinute: number = 200, codeR
   
   // Calculate code content and non-code content
   let codeContent = '';
+  
   codeBlocks.forEach(block => {
     codeContent += block;
   });

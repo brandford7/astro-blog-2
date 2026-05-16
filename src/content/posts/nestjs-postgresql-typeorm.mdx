@@ -1,0 +1,463 @@
+---
+date: 2026-05-20T12:00:00Z
+title: "NestJS + PostgreSQL with TypeORM: Complete Setup Guide"
+description: "Learn how to connect NestJS to PostgreSQL using TypeORM — from installation to entities, relations, and repositories. With real code and the mistakes you'll actually make."
+image: "../../assets/images/26/05/nestjs-postgresql-typeorm.png"
+categories: ["backend development", "NestJS"]
+authors: ["Brandford"]
+tags: ["NestJS", "PostgreSQL", "TypeORM", "TypeScript", "backend", "database"]
+canonical: "https://www.brandfordtech.com/nestjs-postgresql-typeorm/"
+series: ["NestJS With Postgres ", "1"]
+---
+
+import WhatYouLearn from "../../layouts/components/widgets/WhatYouLearn.astro";
+
+Every NestJS tutorial I found early on ended right when things got interesting.
+
+They'd show you how to create a module, wire up a controller, write a service — and then when it came time to actually save something to a database, the tutorial was suddenly over. "Connecting to a database is left as an exercise for the reader."
+
+Annoying. Because that's the hard part.
+
+This article is that missing piece. We're going to connect NestJS to a real PostgreSQL database using TypeORM, create entities, define relationships, and query data properly. And I'll flag the mistakes I made along the way so you don't have to make them too.
+
+If you haven't set up your NestJS project yet or you're not clear on how modules and services work, read [NestJS modules, controllers and services](/nestjs-modules-controllers-services) first — this article builds directly on that foundation.
+
+<WhatYouLearn
+  items={[
+    "How to connect NestJS to PostgreSQL with TypeORM",
+    "How to create entities and map them to database tables",
+    "How to define one-to-many and many-to-one relationships",
+    "How to use repositories to query your database",
+    "The synchronize: true trap and why it will burn you in production",
+    "Common TypeORM errors and exactly what they mean",
+  ]}
+/>
+
+---
+
+## What We're Building
+
+A simple blog API with two entities: `User` and `Post`. A user can have many posts. A post belongs to one user. Classic relationship — but it covers the patterns you'll use in almost every real project.
+
+By the end you'll have a working NestJS app that reads and writes to a real PostgreSQL database.
+
+---
+
+## Step 1: Install the Dependencies
+
+Start with a fresh NestJS project or use your existing one:
+
+```bash
+npm install @nestjs/typeorm typeorm pg
+```
+
+Three packages. That's all you need.
+
+- `@nestjs/typeorm` — NestJS's official TypeORM integration
+- `typeorm` — the ORM itself
+- `pg` — the PostgreSQL driver that TypeORM uses under the hood
+
+---
+
+## Step 2: Set Up PostgreSQL
+
+If you don't have PostgreSQL installed locally, the easiest way is Docker:
+
+```bash
+docker run --name nestjs-pg \
+  -e POSTGRES_USER=nestuser \
+  -e POSTGRES_PASSWORD=nestpass \
+  -e POSTGRES_DB=nestdb \
+  -p 5432:5432 \
+  -d postgres
+```
+
+One command, PostgreSQL is running on port 5432. No installation, no PATH issues.
+
+If you'd rather install it directly, grab it from [postgresql.org](https://www.postgresql.org/download/) and create a database manually:
+
+```sql
+CREATE DATABASE nestdb;
+CREATE USER nestuser WITH PASSWORD 'nestpass';
+GRANT ALL PRIVILEGES ON DATABASE nestdb TO nestuser;
+```
+
+---
+
+## Step 3: Add Your Database Credentials to .env
+
+Never hardcode database credentials. Create a `.env` file in your project root:
+
+```bash
+# .env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=nestuser
+DB_PASSWORD=nestpass
+DB_DATABASE=nestdb
+```
+
+If you haven't set up `@nestjs/config` yet, install it:
+
+```bash
+npm install @nestjs/config
+```
+
+This lets you read `.env` values using `ConfigService` — which we'll use in the next step.
+
+---
+
+## Step 4: Connect TypeORM in AppModule
+
+This is where most tutorials give you a hardcoded connection object and call it a day. We're doing it the right way — using `ConfigService` so your credentials come from environment variables.
+
+Open `app.module.ts` and update it:
+
+```typescript
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { TypeOrmModule } from "@nestjs/typeorm";
+```
+
+Now add the database connection using `forRootAsync` — the async version lets you inject `ConfigService`:
+
+```typescript
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: "postgres",
+        host: config.get<string>("DB_HOST"),
+        port: config.get<number>("DB_PORT"),
+        username: config.get<string>("DB_USERNAME"),
+        password: config.get<string>("DB_PASSWORD"),
+        database: config.get<string>("DB_DATABASE"),
+        entities: [__dirname + "/**/*.entity{.ts,.js}"],
+        synchronize: true, // ⚠️ development only — we'll talk about this
+      }),
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+Notice `synchronize: true`. This tells TypeORM to automatically create and update your database tables based on your entities every time the app starts.
+
+In development, it's convenient. In production, it's dangerous — it can drop columns and lose data. We'll fix this properly in the next article when we cover migrations.
+
+---
+
+## Step 5: Create Your First Entity
+
+An entity is just a TypeScript class that maps to a database table. Let's create the `User` entity.
+
+Generate the users module first:
+
+```bash
+nest generate module users
+nest generate service users
+nest generate controller users
+```
+
+Then create the entity file:
+
+```typescript
+// users/entities/user.entity.ts
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
+```
+
+Add the class with the table columns:
+
+```typescript
+@Entity('users') // maps to the 'users' table in PostgreSQL
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  id: string; // auto-generated UUID primary key
+
+  @Column()
+  name: string;
+
+  @Column({ unique: true })
+  email: string; // unique constraint — no duplicate emails
+
+  @Column({ select: false })
+  password: string; // select: false means this won't be returned in queries by default
+```
+
+Add the timestamps:
+
+```typescript
+  @CreateDateColumn()
+  createdAt: Date; // auto-set when record is created
+
+  @UpdateDateColumn()
+  updatedAt: Date; // auto-updated whenever record changes
+}
+```
+
+`@CreateDateColumn()` and `@UpdateDateColumn()` are TypeORM magic — you don't manage these yourself, TypeORM handles them automatically.
+
+---
+
+## Step 6: Create the Post Entity
+
+Now let's create the `Post` entity and link it to `User`:
+
+```typescript
+// posts/entities/post.entity.ts
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from "typeorm";
+import { User } from "../../users/entities/user.entity";
+```
+
+Define the entity with the relationship:
+
+```typescript
+@Entity('posts')
+export class Post {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  title: string;
+
+  @Column('text') // 'text' type for longer content
+  content: string;
+
+  @Column({ default: false })
+  published: boolean;
+```
+
+Now the relationship — this is where most people get confused:
+
+```typescript
+  @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  author: User;
+
+  @Column()
+  userId: string; // the actual FK column in the database
+
+  @CreateDateColumn()
+  createdAt: Date;
+}
+```
+
+`@ManyToOne` means many posts belong to one user. `onDelete: 'CASCADE'` means if you delete a user, their posts get deleted too. Without that, deleting a user will throw a foreign key violation error.
+
+The `userId` column is important. TypeORM creates the foreign key automatically from the relation, but having the explicit `userId` column lets you query by user ID without joining the whole user object every time.
+
+---
+
+## Step 7: Add the Other Side of the Relationship
+
+Go back to your `User` entity and add the `posts` relation:
+
+```typescript
+// Add this import at the top
+import { OneToMany } from 'typeorm';
+import { Post } from '../../posts/entities/post.entity';
+
+// Add this property inside the User class
+@OneToMany(() => Post, (post) => post.author)
+posts: Post[];
+```
+
+Now the relationship is complete — User knows about Posts, Post knows about User.
+
+> ⚠️ **Watch out for circular imports here.** If User imports Post and Post imports User, TypeScript can get confused. TypeORM's lazy arrow functions in `@OneToMany(() => Post, ...)` exist specifically to avoid this — they delay the evaluation until runtime.
+
+---
+
+## Step 8: Register Entities in Their Modules
+
+This trips people up. You've created the entities but you haven't told NestJS which modules can use them.
+
+In `UsersModule`:
+
+```typescript
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { User } from "./entities/user.entity";
+import { UsersService } from "./users.service";
+import { UsersController } from "./users.controller";
+
+@Module({
+  imports: [TypeOrmModule.forFeature([User])], // register User entity in this module
+  providers: [UsersService],
+  controllers: [UsersController],
+  exports: [UsersService],
+})
+export class UsersModule {}
+```
+
+Do the same in `PostsModule`:
+
+```typescript
+@Module({
+  imports: [TypeOrmModule.forFeature([Post])],
+  providers: [PostsService],
+  controllers: [PostsController],
+})
+export class PostsModule {}
+```
+
+`TypeOrmModule.forFeature()` is what gives your service access to the repository for that entity. Without it, injecting the repository will fail.
+
+---
+
+## Step 9: Use the Repository in Your Service
+
+The repository is your interface to the database. TypeORM provides one for every entity — you just inject it.
+
+```typescript
+// users/users.service.ts
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { User } from "./entities/user.entity";
+```
+
+Inject the repository via the constructor:
+
+```typescript
+@Injectable()
+export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+```
+
+Now write your queries:
+
+```typescript
+  async findAll(): Promise<User[]> {
+    return this.userRepository.find();
+  }
+
+  async findOne(id: string): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    return user;
+  }
+```
+
+Create a user:
+
+```typescript
+  async create(name: string, email: string, hashedPassword: string): Promise<User> {
+    const user = this.userRepository.create({ name, email, password: hashedPassword });
+    return this.userRepository.save(user);
+  }
+```
+
+Two steps — `create()` builds the entity object in memory, `save()` writes it to the database. Don't skip `create()` and just pass a plain object to `save()` — TypeORM's hooks (like `@BeforeInsert`) won't fire.
+
+---
+
+## Step 10: Query with Relations
+
+If you want to fetch a user along with their posts:
+
+```typescript
+async findOneWithPosts(id: string): Promise<User> {
+  const user = await this.userRepository.findOne({
+    where: { id },
+    relations: { posts: true }, // join the posts table
+  });
+
+  if (!user) {
+    throw new NotFoundException(`User with id ${id} not found`);
+  }
+
+  return user;
+}
+```
+
+Without `relations: { posts: true }`, the `posts` field will be `undefined` — not an empty array, just undefined. That's a common gotcha that produces confusing bugs.
+
+You can also use the QueryBuilder for more complex queries:
+
+```typescript
+async findPublishedPosts(): Promise<Post[]> {
+  return this.postRepository
+    .createQueryBuilder('post')
+    .leftJoinAndSelect('post.author', 'user')
+    .where('post.published = :published', { published: true })
+    .orderBy('post.createdAt', 'DESC')
+    .getMany();
+}
+```
+
+QueryBuilder is verbose but gives you full control — useful when you need `WHERE` conditions, sorting, or pagination that `find()` can't handle cleanly.
+
+---
+
+## Common Errors and What They Mean
+
+**`EntityMetadataNotFoundError: No metadata for "User" was found`**
+
+You forgot `TypeOrmModule.forFeature([User])` in your module. Add it.
+
+**`QueryFailedError: column "userId" of relation "posts" does not exist`**
+
+Your entity has a column that doesn't exist in the database yet. Either restart the app (if `synchronize: true` is on) or run a migration. More on migrations in the next article.
+
+**`Cannot read properties of undefined (reading 'posts')`**
+
+You're accessing `user.posts` without loading the relation. Add `relations: { posts: true }` to your query.
+
+**`UnhandledPromiseRejectionWarning: Error: connect ECONNREFUSED 127.0.0.1:5432`**
+
+PostgreSQL isn't running or your connection details are wrong. Check your `.env` file and make sure your DB is up.
+
+---
+
+## Don't Leave `synchronize: true` On in Production
+
+I said it earlier but it's worth repeating.
+
+`synchronize: true` is convenient in development because it keeps your schema in sync with your entities automatically. But in production, every time your app restarts, TypeORM checks your entities against the database schema and makes changes.
+
+That sounds helpful. It isn't. TypeORM can and will drop columns it doesn't recognize, which means data loss.
+
+The correct approach for production is migrations — TypeORM generates SQL migration files that you review and run explicitly. We cover this fully in the next article: [NestJS Database Migrations with TypeORM: Stop Using synchronize: true](/nestjs-typeorm-migrations).
+
+For now, just remember: `synchronize: true` for development, migrations for everything else.
+
+---
+
+## What You Have Now
+
+You've got a NestJS app talking to a real PostgreSQL database. Entities are defined, relationships are wired up, and your services are querying the database through TypeORM repositories.
+
+This is the foundation everything else builds on — auth stores users here, file uploads reference records here, caching sits in front of these queries.
+
+The next thing to tackle is making this production-safe with proper database migrations, which we cover in [NestJS TypeORM Migrations: The Right Way to Manage Your Database Schema](/nestjs-typeorm-migrations).
+
+If you have questions or something broke — drop it in the comments. I've hit most TypeORM errors personally so I can probably help.
+
+---
+
+> Connect NestJS to PostgreSQL using TypeORM — full setup guide covering entities, relations, repositories, and the synchronize: true mistake you don't want to make in production.

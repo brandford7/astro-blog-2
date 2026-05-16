@@ -1,0 +1,383 @@
+---
+date: 2026-05-18T12:00:00Z
+title: "NestJS Guards vs Middleware: When to Use Which"
+description: "Guards and middleware look similar in NestJS but they solve very different problems. Here's how to tell them apart and know exactly when to reach for each one."
+image: "../../assets/images/26/05/nestjs-guards-vs-middleware.png"
+categories: ["backend development", "NestJS"]
+authors: ["Brandford"]
+tags: ["NestJS", "Guards", "Middleware", "TypeScript", "backend", "Node.js"]
+series: ["Introduction To Nest JS Tutorials", "4"]
+canonical: "https://www.brandfordtech.com/nestjs-guards-vs-middleware/"
+---
+
+import WhatYouLearn from '../../layouts/components/widgets/WhatYouLearn.astro';
+
+When I first got serious about NestJS, Guards confused me more than anything else.
+
+Not because they're complex. But because they looked exactly like middleware to me — something that runs before your route handler and decides whether to continue or stop. I kept asking myself: why do both exist? When do I use one over the other?
+
+Turns out they solve completely different problems. And once I understood that, a lot of other NestJS decisions started making more sense too.
+
+In this article we're going to settle this properly. If you've already read how [NestJS modules, controllers, and services work](/nestjs-modules-controllers-services), you'll have the context you need. If you haven't, I'd start there first.
+
+<WhatYouLearn items={[
+  "What Guards actually are and how they differ from middleware",
+  "When to use middleware vs when to reach for a Guard",
+  "How to write a custom Guard from scratch",
+  "How to pass data from a Guard into your route handler",
+  "Real-world scenarios for each one with working code"
+]} />
+ 
+
+---
+
+## Let's Agree On What Middleware Is
+
+You know middleware from Express. It's a function that sits between the request and the response. It runs, does something, then either passes control to the next function or stops the chain.
+
+```typescript
+// A basic NestJS middleware — looks almost identical to Express
+import { Injectable, NestMiddleware } from "@nestjs/common";
+import { Request, Response, NextFunction } from "express";
+
+@Injectable()
+export class LoggerMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next(); // pass control to the next handler
+  }
+}
+```
+
+Middleware in NestJS works at the **HTTP adapter layer** — it runs before NestJS even knows which route or controller is being hit. It has access to `req` and `res` directly.
+
+That's actually the key thing to remember. Middleware runs early, before NestJS's routing kicks in.
+
+---
+
+## So What's a Guard Then?
+
+A Guard runs **after** middleware but **before** the route handler. And unlike middleware, a Guard knows about the NestJS execution context — it knows which controller is being called, which method, and what decorators are on it.
+
+Guards answer one specific question: **should this request be allowed to proceed?**
+
+That's it. They return `true` (let it through) or `false` (block it). If they return false, NestJS automatically throws a 403 Forbidden.
+
+```typescript
+import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
+
+@Injectable()
+export class BasicGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    // context gives you access to the request, handler, and class
+    const request = context.switchToHttp().getRequest();
+
+    // Your logic here — return true to allow, false to block
+    return true;
+  }
+}
+```
+
+Simple enough. But the real power of Guards is that `ExecutionContext` — let's talk about that.
+
+---
+
+## The ExecutionContext: What Makes Guards Special
+
+Middleware has `req` and `res`. That's all.
+
+Guards have `ExecutionContext`, which gives you much more:
+
+```typescript
+canActivate(context: ExecutionContext): boolean {
+  // Get the HTTP request — same as req in middleware
+  const request = context.switchToHttp().getRequest();
+
+  // Get the handler (the actual controller method being called)
+  const handler = context.getHandler();
+
+  // Get the class (the controller itself)
+  const controller = context.getClass();
+
+  // This is how Guards can read custom decorators on routes
+  // (we'll get to this in a minute)
+  return true;
+}
+```
+
+This is why Guards are used for auth and not middleware. A Guard can look at your route and say "this route has `@Roles('admin')` on it — does the current user have that role?" Middleware can't do that, because middleware doesn't know anything about decorators or which controller is handling the request.
+
+---
+
+## The Difference in Plain English
+
+Let me just say it directly.
+
+**Use middleware when:**
+
+- You need to log every request
+- You need to set headers on every response
+- You need to parse something before NestJS routing runs
+- The logic doesn't depend on _which_ route is being hit
+
+**Use a Guard when:**
+
+- You're checking if a user is authenticated
+- You're checking if a user has the right role or permission
+- Your logic depends on decorators or metadata on the route
+- You want NestJS to handle the 401/403 response automatically
+
+The simplest version: middleware is for **cross-cutting concerns** (things every request needs), Guards are for **access control** (who's allowed to do what).
+
+---
+
+## Building a Real Auth Guard
+
+Let's build the Guard that actually matters — a JWT auth guard. If you followed the [JWT authentication article](/nestjs-jwt-authentication), you already have the `JwtStrategy` set up. This Guard uses it.
+
+First, create the guard file:
+
+```typescript
+// auth/guards/jwt-auth.guard.ts
+import {
+  Injectable,
+  ExecutionContext,
+  UnauthorizedException,
+} from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
+```
+
+Then extend it:
+
+```typescript
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  canActivate(context: ExecutionContext) {
+    // Call the parent canActivate which handles JWT validation
+    return super.canActivate(context);
+  }
+```
+
+And handle the case where the token is missing or invalid:
+
+```typescript
+  handleRequest(err: any, user: any) {
+    if (err || !user) {
+      // Throw this instead of the default 401 — gives you control over the message
+      throw err || new UnauthorizedException('You need to be logged in to access this');
+    }
+    return user;
+  }
+}
+```
+
+Apply it to any route:
+
+```typescript
+// GET /users/me — only logged in users can access this
+@Get('me')
+@UseGuards(JwtAuthGuard)
+getProfile(@Req() req) {
+  return req.user; // the user object comes from JwtStrategy.validate()
+}
+```
+
+Or protect an entire controller at once:
+
+```typescript
+@Controller("users")
+@UseGuards(JwtAuthGuard) // every route in this controller is now protected
+export class UsersController {}
+```
+
+---
+
+## Building a Roles Guard (The Real World Example)
+
+This is where Guards go from useful to genuinely powerful.
+
+Say you have admin-only routes. You don't want to manually check `req.user.role === 'admin'` in every controller method — that's fragile and repetitive.
+
+Instead, you create a `@Roles()` decorator and a `RolesGuard` that reads it automatically.
+
+**Step 1 — Create the decorator:**
+
+```typescript
+// auth/decorators/roles.decorator.ts
+import { SetMetadata } from "@nestjs/common";
+
+export const ROLES_KEY = "roles";
+export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
+```
+
+`SetMetadata` attaches data to a route. The Guard reads it later.
+
+**Step 2 — Create the RolesGuard:**
+
+```typescript
+// auth/guards/roles.guard.ts
+import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { ROLES_KEY } from "../decorators/roles.decorator";
+```
+
+The `Reflector` is what lets Guards read metadata from decorators:
+
+```typescript
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    // Read the roles required for this route
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(
+      ROLES_KEY,
+      [
+        context.getHandler(), // check method decorator first
+        context.getClass(), // fall back to class decorator
+      ],
+    );
+
+    // If no roles required, allow through
+    if (!requiredRoles) return true;
+
+    // Get the user from the request (set by JwtAuthGuard)
+    const { user } = context.switchToHttp().getRequest();
+
+    // Check if the user has at least one of the required roles
+    return requiredRoles.some((role) => user?.roles?.includes(role));
+  }
+}
+```
+
+**Step 3 — Use both Guards together:**
+
+```typescript
+@Controller("admin")
+@UseGuards(JwtAuthGuard, RolesGuard) // order matters — auth first, then roles
+export class AdminController {
+  @Get("dashboard")
+  @Roles("admin") // only users with the 'admin' role get through
+  getDashboard() {
+    return { message: "Welcome to the admin dashboard" };
+  }
+
+  @Delete("users/:id")
+  @Roles("admin", "superadmin") // either role works
+  deleteUser(@Param("id") id: string) {
+    return { deleted: id };
+  }
+}
+```
+
+That's clean. You look at a route and immediately know who can access it. No logic buried in the handler.
+
+---
+
+## How to Register Middleware (It's Different From Guards)
+
+Guards are applied with `@UseGuards()`. Middleware is registered in the module.
+
+```typescript
+// app.module.ts
+import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common";
+import { LoggerMiddleware } from "./common/middleware/logger.middleware";
+
+@Module({})
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes("*"); // apply to all routes
+  }
+}
+```
+
+You can also apply middleware to specific routes or controllers:
+
+```typescript
+consumer.apply(LoggerMiddleware).forRoutes("users"); // only /users routes
+
+// or exclude specific routes
+consumer
+  .apply(LoggerMiddleware)
+  .exclude({ path: "auth/login", method: RequestMethod.POST })
+  .forRoutes("*");
+```
+
+Middleware registration in the module, Guards via decorators. That's the pattern.
+
+---
+
+## The Request Lifecycle (Where Each One Fits)
+
+When a request hits your NestJS app, here's the order things run:
+
+```
+Incoming Request
+      ↓
+  Middleware        ← runs first, before NestJS routing
+      ↓
+  Guards            ← is this user allowed?
+      ↓
+  Interceptors      ← transform request/response
+      ↓
+  Pipes             ← validate and transform input
+      ↓
+  Route Handler     ← your controller method
+      ↓
+  Interceptors      ← transform the response
+      ↓
+  Exception Filters ← catch any errors
+      ↓
+  Response
+```
+
+Knowing this order saves you from bugs that are genuinely hard to debug. If your Guard is failing but you're not sure why, check whether your middleware is stripping the Authorization header before the Guard gets to see it.
+
+---
+
+## A Quick Gotcha Worth Knowing
+
+Guards that need to read from the database (like checking if a user is banned) need the service injected. That works fine — but you have to register the Guard as a provider in your module, not just use it as a decorator.
+
+```typescript
+// ❌ This won't work if your Guard has dependencies
+providers: [];
+
+// ✅ Register it properly so NestJS can inject dependencies
+providers: [RolesGuard, UsersService];
+```
+
+If you're applying the Guard globally via `APP_GUARD`, it gets registered in `AppModule` providers:
+
+```typescript
+import { APP_GUARD } from "@nestjs/core";
+
+@Module({
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard, // applies to every route in the entire app
+    },
+  ],
+})
+export class AppModule {}
+```
+
+> Global guards are useful when most of your routes are protected and you want public routes to be the exception rather than the rule.
+
+
+## Summary: The Decision Is Simpler Than It Looks
+
+If you need something that runs before routing and doesn't need to know anything about which controller or method is being called — use middleware.
+
+If you need to check who the user is, what role they have, or read metadata from decorators, use a Guard.
+
+Most of the time, logging and request parsing go in middleware. Auth and permissions go in Guards. That's really the whole thing.
+
+Next up in this series we'll tackle [error handling in NestJS](/nestjs-error-handling) — specifically how `@ControllerAdvice` works and how to send consistent error responses across your entire API without repeating yourself everywhere. That one trips up a lot of people coming from Express where you just do `res.status(400).json({ error: '...' })` and move on.
+
+
+_If you have a question or something I missed? Drop it in the comments and I'll get back to you._
+
+
+> Guards and middleware in NestJS look similar but solve different problems. Learn when to use each one, how to build a Roles Guard, and where they fit in the request lifecycle.
